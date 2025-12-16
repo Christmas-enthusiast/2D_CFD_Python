@@ -71,9 +71,9 @@ class ScalarGrid:
 
         for jIndex, rowList in enumerate((self.scalarGrid)):
             for iIndex, scalarValue in enumerate(rowList):
-                test = font.render(str(scalarValue),10,Config.WHITE)
+                test = font.render(str(scalarValue), False ,Config.WHITE)
                 screen.blit(test, (Config.GridOrigin[0]+(cellCenter*0)+Config.CellVisualSize*iIndex, 
-                                   Config.GridOrigin[1]+(cellCenter*0)+Config.CellVisualSize*jIndex))
+                                   Config.GridOrigin[1]+(cellCenter*0.25)+Config.CellVisualSize*jIndex))
 
 
     def randomizeScalarField(self):
@@ -81,7 +81,31 @@ class ScalarGrid:
             for iIndex in range(self.columns):
                 self.scalarGrid[jIndex][iIndex] = np.float64(random.random()*5-2.5)
 
-    def calculateDivergence(self, VectorField):
-        for jIndex in range(self.rows):
-            for iIndex in range(self.columns):
+    def calculateDivergence(self, HVectors, VVectors):
+        HVectors = HVectors.scalarGrid
+        VVectors = VVectors.scalarGrid
+        for j in range(self.rows):
+            for i in range(self.columns):
+                self.scalarGrid[j][i] = (HVectors[j][i]-HVectors[j][i+1]) + (VVectors[j][i]-VVectors[j+1][i])
+    
+    def setBoundaryCondition1(self, gridType ,wallDirection, condition):
+        match condition:
+            case "fan":
+                self.applyBoundaryCondition(wallDirection)
+            case "wall":
+                self.applyBoundaryCondition(wallDirection)
+            case "void":
+                self.applyBoundaryCondition(wallDirection)
+        
+
+    def setBoundaryCondition2(self, wallDirection):
+        match wallDirection:
+            case "north":
                 pass
+        
+
+    def calculatePressureGrid(self, divGrid):
+        divGrid = divGrid.scalarGrid
+        for j in range(self.rows):
+            for i in range(self.columns):
+                self.scalarGrid[j][i] = 

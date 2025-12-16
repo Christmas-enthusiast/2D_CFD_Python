@@ -9,11 +9,12 @@ pygame.display.set_caption("2D CFD")
 
 clock = pygame.time.Clock()
 
-testGrid = ScalarGrid(Config.rowCount,Config.columnCount)
+pressureGrid = ScalarGrid(Config.rowCount,Config.columnCount)
+divergenceGrid = ScalarGrid(Config.rowCount, Config.columnCount)
 #3 rows of centered grid cells is equal to 4 rows of vectors |#|#|#|
 hVectorField = ScalarGrid(Config.rowCount, Config.columnCount+1) 
 vVectorField = ScalarGrid(Config.rowCount+1, Config.columnCount)
-textFont = pygame.font.Font(None, 30)
+textFont = pygame.font.Font(None, Config.ScalarFontSize)
 
 hVectorField.randomizeScalarField()
 vVectorField.randomizeScalarField()
@@ -23,9 +24,11 @@ while running:
         if event.type == pygame.QUIT:
             running = False
     
-    testGrid.labelScalars(screen, textFont)
     hVectorField.drawHorizontalVectorField(screen)
     vVectorField.drawVerticalVectorField(screen)
+    divergenceGrid.calculateDivergence(hVectorField,vVectorField)
+
+    divergenceGrid.labelScalars(screen, textFont)
 
 
 
