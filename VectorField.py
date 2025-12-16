@@ -24,14 +24,12 @@ class VectorField:
         for x in range(rows): #Hvectors arranged as a list of lists containing all vectors in a row
             self.HVectors.append([])
             for _ in range(columns+1):
-                self.HVectors[x].append(np.array([np.float64(0),np.float64(0)]))
-        print(len(self.HVectors))
-        print(len(self.HVectors[0]))
+                self.HVectors[x].append(np.float64(0))
                 
         for y in range(rows+1): #Vvectors arranged as a list of lists containing all vectors in a row
             self.VVectors.append([])
             for _ in range(columns):
-                self.VVectors[y].append(np.array([np.float64(0),np.float64(0)]))  
+                self.VVectors[y].append(np.float64(0))  
 
 
         # for _ in range(rows+1):
@@ -48,27 +46,29 @@ class VectorField:
         for jIndex, rowList in enumerate(self.HVectors):
             for iIndex, vector in enumerate(rowList):
                 vectorStart = (xOffset+cellSize*iIndex, yOffset+cellCenter+cellSize*jIndex)
-                vectorEndX = xOffset+cellSize*iIndex+vector[0]*Config.VectorVisualScale
-                vectorEndY = yOffset+cellCenter+cellSize*jIndex+vector[1]*Config.VectorVisualScale
+                vectorEndX = xOffset+cellSize*iIndex+vector*Config.VectorVisualScale
+                vectorEndY = yOffset+cellCenter+cellSize*jIndex
 
                 pygame.draw.line(screen, Config.RED, vectorStart, (vectorEndX, vectorEndY))
-                pygame.draw.circle(screen,Config.RED, (vectorEndX, vectorEndY), 5)
-        
+                pygame.draw.circle(screen,Config.RED, (vectorEndX, vectorEndY), Config.VectorBallRadius)
+
         for jIndex, rowList in enumerate(self.VVectors):
             for iIndex, vector in enumerate(rowList):
                 vectorStart = (xOffset+cellCenter+cellSize*iIndex, yOffset+cellSize*jIndex)
-                vectorEndX = xOffset+cellCenter+cellSize*iIndex+vector[0]*Config.VectorVisualScale
-                vectorEndY = yOffset+cellSize*jIndex+vector[1]*Config.VectorVisualScale
+                vectorEndX = xOffset+cellCenter+cellSize*iIndex
+                vectorEndY = yOffset+cellSize*jIndex+vector*Config.VectorVisualScale
 
                 pygame.draw.line(screen, Config.GREEN, vectorStart,(vectorEndX, vectorEndY))
-                pygame.draw.circle(screen,Config.GREEN, (vectorEndX, vectorEndY), 5)
+                pygame.draw.circle(screen,Config.GREEN, (vectorEndX, vectorEndY), Config.VectorBallRadius)
 
 
     def randomizeVectorField(self):
         for jIndex in range(self.HVrows):
             for iIndex in range(self.HVcolumns):
-                self.HVectors[jIndex][iIndex] = np.array([random.random()*10,random.random()*10])
-
+                self.HVectors[jIndex][iIndex] = np.float64(random.random()*5-2.5)
+        for jIndex in range(self.VVrows):
+            for iIndex in range(self.VVcolumns):
+                self.VVectors[jIndex][iIndex] = np.float64(random.random()*5-2.5)
 
     def drawVector(self, screen, vector, color):
         # pygame.draw.line(screen, )

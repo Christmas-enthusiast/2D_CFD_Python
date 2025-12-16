@@ -1,7 +1,6 @@
 import pygame
 import Config
-from CenteredGrid import CenteredGrid
-from VectorField import VectorField
+from CenteredGrid import ScalarGrid
 
 pygame.init()
 
@@ -10,11 +9,14 @@ pygame.display.set_caption("2D CFD")
 
 clock = pygame.time.Clock()
 
-testGrid = CenteredGrid(2,5)
-vectorField = VectorField(2,5)
+testGrid = ScalarGrid(Config.rowCount,Config.columnCount)
+#3 rows of centered grid cells is equal to 4 rows of vectors |#|#|#|
+hVectorField = ScalarGrid(Config.rowCount, Config.columnCount+1) 
+vVectorField = ScalarGrid(Config.rowCount+1, Config.columnCount)
 textFont = pygame.font.Font(None, 30)
 
-vectorField.randomizeVectorField()
+hVectorField.randomizeScalarField()
+vVectorField.randomizeScalarField()
 running = True
 while running:
     for event in pygame.event.get():
@@ -22,7 +24,8 @@ while running:
             running = False
     
     testGrid.labelScalars(screen, textFont)
-    vectorField.drawVectorField(screen)
+    hVectorField.drawHorizontalVectorField(screen)
+    vVectorField.drawVerticalVectorField(screen)
 
 
 
