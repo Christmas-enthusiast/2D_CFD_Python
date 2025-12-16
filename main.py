@@ -1,45 +1,39 @@
 import pygame
-import sys
+import Config
+# from CenteredGrid import CenteredGrid
 
-def main():
-    # Initialize Pygame
-    pygame.init()
+pygame.init()
 
-    # Screen settings
-    SCREEN_WIDTH = 800
-    SCREEN_HEIGHT = 600
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption("My Pygame Boilerplate")
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("2D CFD")
 
-    # Clock for controlling frame rate
-    clock = pygame.time.Clock()
-    FPS = 60
+clock = pygame.time.Clock()
 
-    # Game loop
-    running = True
-    while running:
-        # Event handling
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            # Add other event handling (e.g., keyboard/mouse input) here
+# testGrid = CenteredGrid(2,5)
+my_font = pygame.font.Font(None, 30)
 
-        # Game logic and updates
-        # ...
+text = my_font.render("testing", 30, Config.BLACK)
 
-        # Drawing
-        screen.fill((30, 30, 30)) # Fill the screen with a dark gray color
-        # Add drawing code here (e.g., blitting images, drawing shapes)
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+    
 
-        # Update the display
-        pygame.display.flip()
+    # print(testGrid.VScalars)
+    # screen.fill(Config.WHITE) 
+    for x in range(255):
+        rect = pygame.Rect(x*(Config.SCREENWIDTH/255), 0, 1*(Config.SCREENWIDTH/255), Config.SCREENHEIGHT)
+        pygame.draw.rect(screen, (x,255,255), rect, 1)
+    screen.blit(text, (100,100))
+    pygame.display.flip()
+    screen.fill(Config.WHITE)
 
-        # Cap the frame rate
-        clock.tick(FPS)
+    # Cap the frame rate
+    clock.tick()
 
-    # Quit Pygame
-    pygame.quit()
-    sys.exit()
-
-if __name__ == "__main__":
-    main()
+# Quit Pygame
+pygame.quit()
