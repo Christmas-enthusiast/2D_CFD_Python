@@ -1,13 +1,15 @@
-SCREENWIDTH = 1000
-SCREENHEIGHT = 700
+SCREENWIDTH = 900
+SCREENHEIGHT = 600
 
 rowCount = 5
 columnCount = 6 #in context of centered grids
+GaussSeidelIterations = 10
 
 
 GridOrigin = [50,50]
-CellVisualSize = 150
+CellVisualSize = 100
 ScalarFontSize = 20
+ScalarGridDigitCount = 3
 
 VectorVisualScale = 10
 VectorBallRadius = 3
