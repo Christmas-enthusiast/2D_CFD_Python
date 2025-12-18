@@ -9,28 +9,35 @@ pygame.display.set_caption("2D CFD")
 
 clock = pygame.time.Clock()
 
-pressureGrid = ScalarGridChildren.PressureField(Config.rowCount,Config.columnCount)
-divergenceGrid = ScalarGridChildren.DivergenceField(Config.rowCount, Config.columnCount)
-cellMapGrid = ScalarGridChildren.CellMap(Config.rowCount, Config.columnCount)
+pressureGrid = ScalarGridChildren.PressureField(Config.rowCount,Config.columnCount, (0,0))
+divergenceGrid = ScalarGridChildren.DivergenceField(Config.rowCount, Config.columnCount, (0,0.2))
+cellMapGrid = ScalarGridChildren.CellMap(Config.rowCount, Config.columnCount, (0,0))
 
 #3 rows of centered grid cells is equal to 4 rows of vectors |#|#|#|
-hVectorField = ScalarGridChildren.VectorField(Config.rowCount, Config.columnCount+1) 
-vVectorField = ScalarGridChildren.VectorField(Config.rowCount+1, Config.columnCount)
+hVectorField = ScalarGridChildren.VectorField(Config.rowCount, Config.columnCount+1, Config.RED, (0, 0.5), (1,0)) 
+vVectorField = ScalarGridChildren.VectorField(Config.rowCount+1, Config.columnCount, Config.GREEN, (0.5, 0), (0,1))
 
 
 textFont = pygame.font.Font(None, Config.ScalarFontSize)
 
-hVectorField.randomizeScalarField()
-vVectorField.randomizeScalarField()
+# hVectorField.randomizeScalarField()
+# vVectorField.randomizeScalarField()
 divergenceGrid.calculateDivergence(hVectorField,vVectorField)
 pressureGrid.calculatePressureGrid(divergenceGrid, cellMapGrid)
+
+# temphVectorField = ScalarGridChildren.VectorField(Config.rowCount, Config.columnCount+1, (0.5, 0)) 
+# tempvVectorField = ScalarGridChildren.VectorField(Config.rowCount+1, Config.columnCount, (0, 0.5))
+visualVectorField = ScalarGridChildren.VisualVectorField(Config.rowCount*Config.VisualVectorGridUpscaleConstant,
+                                                         Config.columnCount*Config.VisualVectorGridUpscaleConstant,
+                                                         Config.BLUE, (0,0), (1,1))
 
 cellMapGrid.setWallSolid('north')
 cellMapGrid.setWallSolid('east')
 cellMapGrid.setWallSolid('south')
 cellMapGrid.setWallSolid('west')
-hVectorField.setHorizontalBoundaryConditions(cellMapGrid)
-vVectorField.setVerticalBoundaryConditions(cellMapGrid)
+hVectorField.setBoundaryConditions(cellMapGrid)
+vVectorField.setBoundaryConditions(cellMapGrid)
+
 
 
 running = True
@@ -47,24 +54,32 @@ while running:
 
                 pressureGrid.GaussSeidelLoop(divergenceGrid,cellMapGrid)
          
+                hVectorField.calculateVelocityGrid(pressureGrid)
+                vVectorField.calculateVelocityGrid(pressureGrid)
 
-                hVectorField.calculateHorizontalVelocityGrid(pressureGrid)
-                vVectorField.calculateVerticalVelocityGrid(pressureGrid)
+                hVectorField.setBoundaryConditions(cellMapGrid)
+                vVectorField.setBoundaryConditions(cellMapGrid)
 
-                hVectorField.setHorizontalBoundaryConditions(cellMapGrid)
-                vVectorField.setVerticalBoundaryConditions(cellMapGrid)
-                print('test')
             if event.key == pygame.K_r:
-                hVectorField.scalarGrid[3][4] += 1
+                hVectorField.scalarGrid[3][4] -= 5
+            if event.key == pygame.K_t:
+                hVectorField.scalarGrid[3][4] += 5
+            if event.key == pygame.K_f:
+                vVectorField.scalarGrid[3][4] -= 5
+            if event.key == pygame.K_g:
+                vVectorField.scalarGrid[3][4] += 5
 
     divergenceGrid.calculateDivergence(hVectorField,vVectorField)
-    hVectorField.drawHorizontalVectorField(screen)
-    vVectorField.drawVerticalVectorField(screen)
-    
+    visualVectorField.interpolateUpscaledGrid(hVectorField,vVectorField)
 
-                
-    # pressureGrid.calculatePressureGrid(divergenceGrid, cellMapGrid)
+    visualVectorField.drawVectorField(screen)
 
+
+    hVectorField.drawVectorField(screen)
+    vVectorField.drawVectorField(screen)
+    pressureGrid.drawGrid(screen)
+    # divergence on bottom
+    pressureGrid.labelScalars(screen, textFont)
     divergenceGrid.labelScalars(screen, textFont)
 
 

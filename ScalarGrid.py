@@ -4,12 +4,13 @@ import Config
 import random
 
 class ScalarGrid:
-    def __init__(self, rows, columns):
+    def __init__(self, rows, columns, origin):
 
         # self.HScalars = []
         # self.VScalars = []
         self.rows = rows
         self.columns = columns
+        self.origin = origin
 
         self.scalarGrid = []
         
@@ -21,8 +22,8 @@ class ScalarGrid:
 
 
     def drawGrid(self, screen):
-        xOffset = Config.GridOrigin[0]
-        yOffset = Config.GridOrigin[1]
+        xOffset = Config.GridOrigin[0] + self.origin[0]*Config.CellVisualSize
+        yOffset = Config.GridOrigin[1] 
         cellSize = Config.CellVisualSize
         for rows in range(self.rows+1):
             pygame.draw.line(screen, Config.WHITE, #horizontal lines
@@ -36,14 +37,14 @@ class ScalarGrid:
     
 
     def labelScalars(self, screen, font):
-        self.drawGrid(screen)
+        
         cellCenter = Config.CellVisualSize/2
 
         for jIndex, rowList in enumerate((self.scalarGrid)):
             for iIndex, scalarValue in enumerate(rowList):
-                test = font.render(str(round(scalarValue,Config.ScalarGridDigitCount)), False ,Config.WHITE)
-                screen.blit(test, (Config.GridOrigin[0]+(cellCenter*0)+Config.CellVisualSize*iIndex, 
-                                   Config.GridOrigin[1]+(cellCenter*0.25)+Config.CellVisualSize*jIndex))
+                test = font.render(str(round(scalarValue,Config.ScalarGridRoundingCutoff)), False ,Config.WHITE)
+                screen.blit(test, (Config.GridOrigin[0]+ self.origin[0]*Config.CellVisualSize+(cellCenter*0)+Config.CellVisualSize*iIndex, 
+                                   Config.GridOrigin[1]+ self.origin[1]*Config.CellVisualSize+(cellCenter*0.25)+Config.CellVisualSize*jIndex))
 
 
     def randomizeScalarField(self):
