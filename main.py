@@ -27,9 +27,13 @@ pressureGrid.calculatePressureGrid(divergenceGrid, cellMapGrid)
 
 # temphVectorField = ScalarGridChildren.VectorField(Config.rowCount, Config.columnCount+1, (0.5, 0)) 
 # tempvVectorField = ScalarGridChildren.VectorField(Config.rowCount+1, Config.columnCount, (0, 0.5))
-visualVectorField = ScalarGridChildren.VisualVectorField(Config.rowCount*Config.VisualVectorGridUpscaleConstant,
-                                                         Config.columnCount*Config.VisualVectorGridUpscaleConstant,
-                                                         Config.BLUE, (0,0), (1,1))
+visualVectorField = ScalarGridChildren.VisualVectorField(Config.rowCount*Config.upscaleConstant,
+                                                         Config.columnCount*Config.upscaleConstant,
+                                                         Config.BLUE, (0.5,0.5), (1,1))
+
+temphVectorField = ScalarGridChildren.VectorField(Config.rowCount, Config.columnCount+1, Config.RED, (0, 0.5), (1,0)) 
+tempvVectorField = ScalarGridChildren.VectorField(Config.rowCount+1, Config.columnCount, Config.GREEN, (0.5, 0), (0,1)) 
+
 
 cellMapGrid.setWallSolid('north')
 cellMapGrid.setWallSolid('east')
@@ -50,37 +54,65 @@ while running:
             running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
+                # temphVectorField.advectVelocities(hVectorField, vVectorField)
+                # tempvVectorField.advectVelocities(vVectorField, vVectorField)
+                # hVectorField.scalarGrid = temphVectorField.scalarGrid
+                # vVectorField.scalarGrid = tempvVectorField.scalarGrid
+
                 divergenceGrid.calculateDivergence(hVectorField,vVectorField)
+                
 
                 pressureGrid.GaussSeidelLoop(divergenceGrid,cellMapGrid)
-         
+                # pressureGrid.GaussSeidelLoopDebug(divergenceGrid,cellMapGrid, screen, textFont)
+
                 hVectorField.calculateVelocityGrid(pressureGrid)
                 vVectorField.calculateVelocityGrid(pressureGrid)
 
                 hVectorField.setBoundaryConditions(cellMapGrid)
                 vVectorField.setBoundaryConditions(cellMapGrid)
 
+
+            if event.key == pygame.K_0:
+                hVectorField.setZero()
+                vVectorField.setZero()
             if event.key == pygame.K_r:
-                hVectorField.scalarGrid[3][4] -= 5
+                hVectorField.scalarGrid[3][4] -= 0.25
             if event.key == pygame.K_t:
-                hVectorField.scalarGrid[3][4] += 5
+                hVectorField.scalarGrid[3][4] += 0.25
             if event.key == pygame.K_f:
-                vVectorField.scalarGrid[3][4] -= 5
+                vVectorField.scalarGrid[3][4] -= 0.25
             if event.key == pygame.K_g:
-                vVectorField.scalarGrid[3][4] += 5
+                vVectorField.scalarGrid[3][4] += 0.25
+
 
     divergenceGrid.calculateDivergence(hVectorField,vVectorField)
+    # pressureGrid.GaussSeidelLoop(divergenceGrid, cellMapGrid)
+
+    # pressureGrid.calculatePressureGrid(divergenceGrid,cellMapGrid)
+
+    # hVectorField.calculateVelocityGrid(pressureGrid)
+    # vVectorField.calculateVelocityGrid(pressureGrid)
+
+    # hVectorField.setBoundaryConditions(cellMapGrid)
+    # vVectorField.setBoundaryConditions(cellMapGrid)
+
+    # temphVectorField.advectVelocities(hVectorField)
+    # tempvVectorField.advectVelocities(vVectorField)
+    # hVectorField.scalarGrid = temphVectorField.scalarGrid
+    # vVectorField.scalarGrid = tempvVectorField.scalarGrid
+
+    # divergenceGrid.calculateDivergence(hVectorField,vVectorField)
+    # print(hVectorField.scalarGrid)
     visualVectorField.interpolateUpscaledGrid(hVectorField,vVectorField)
 
     visualVectorField.drawVectorField(screen)
 
-
-    hVectorField.drawVectorField(screen)
-    vVectorField.drawVectorField(screen)
-    pressureGrid.drawGrid(screen)
-    # divergence on bottom
-    pressureGrid.labelScalars(screen, textFont)
-    divergenceGrid.labelScalars(screen, textFont)
+    # hVectorField.drawVectorField(screen)
+    # vVectorField.drawVectorField(screen)
+    # pressureGrid.drawGrid(screen)
+    # # divergence on bottom
+    # pressureGrid.labelScalars(screen, textFont)
+    # divergenceGrid.labelScalars(screen, textFont)
 
 
 
