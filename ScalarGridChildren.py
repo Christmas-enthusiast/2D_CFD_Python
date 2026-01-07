@@ -4,7 +4,12 @@ import numpy as np
 import Config
 from ScalarGrid import ScalarGrid
 
-
+class VectorFieldNew():
+    def __init__(self, rows, columns, colour, origin=[0,0]):
+        for x in range(rows): #arranged as a list containing lists of all values in a row
+            self.scalarGrid.append([])
+            for _ in range(columns):
+                self.scalarGrid[x].append(np.float64(0))
 
 class VectorField(ScalarGrid):
     def __init__(self, rows, columns, colour, origin, gridDirection):
@@ -54,6 +59,7 @@ class VectorField(ScalarGrid):
                 if cellMapGrid[j][i] == 1:
                     self.scalarGrid[j][i] = np.float64(0)
                     self.scalarGrid[j+verticalChange][i+horizontalChange] = np.float64(0)
+                
 
     def calculateVelocityGrid(self, pressureGrid):
         # verticalChange = 0
@@ -68,14 +74,18 @@ class VectorField(ScalarGrid):
             for i in range(1,self.columns-1):
                 self.scalarGrid[j][i] -= ( preGrid[j-self.gridDirection[1]][i-self.gridDirection[0]] - preGrid[j][i])*Config.kConstant
 
-    def bilinearInterpolate(self, coordinates): #coordinate in real world values
+    def bilinearInterpolate(self, coordinates, printStatus): #coordinate in real world values
         # xCoord = coordinates[0]
         # yCoord = coordinates[1]
         # jIndex = int((coordinates[1] + (self.origin[0]*Config.CellSize*2))/Config.CellSize)
         # iIndex = int((coordinates[0] + (self.origin[1]*Config.CellSize*2))/Config.CellSize)
 
-        xCoord = coordinates[0] + (self.origin[1]*Config.CellSize*1)
-        yCoord = coordinates[1] + (self.origin[0]*Config.CellSize*1)
+        # xCoord = coordinates[0] + (self.origin[1]*Config.CellSize*1)
+        # yCoord = coordinates[1] + (self.origin[0]*Config.CellSize*1)
+
+        xCoord = coordinates[0] + (self.origin[1]*Config.CellSize)
+        yCoord = coordinates[1] + (self.origin[0]*Config.CellSize)
+
         xCoord /= Config.CellSize
         yCoord /= Config.CellSize
         jIndex = int((coordinates[1])/(Config.CellSize))
@@ -83,49 +93,86 @@ class VectorField(ScalarGrid):
         xPercentage = (xCoord-iIndex)
         yPercentage = (yCoord-jIndex)
 
+        # print(self.gridDirection[0])
+        # print(self.scalarGrid)
+        # print("\n")
+        # print(coordinates)
+        # print(xCoord)
+        # print(yCoord)
+        # print(jIndex)
+        # print(iIndex)
+        # print('*****')
+
+
         NWVelocity = self.scalarGrid[jIndex][iIndex]
         # print(NWVelocity)
         NEVelocity = self.scalarGrid[jIndex][iIndex+1]
         SWVelocity = self.scalarGrid[jIndex+1][iIndex]
         SEVelocity = self.scalarGrid[jIndex+1][iIndex+1]
 
-        topX = (xPercentage/Config.CellSize)*NEVelocity + ((1-xPercentage)/Config.CellSize)*NWVelocity
-        # print(topX)
-        bottomX = (xPercentage/Config.CellSize)*SEVelocity + ((1-xPercentage)/Config.CellSize)*SWVelocity
-        # print(bottomX)
+        # topX = (xPercentage/Config.CellSize)*NEVelocity + ((1-xPercentage)/Config.CellSize)*NWVelocity
+        # bottomX = (xPercentage/Config.CellSize)*SEVelocity + ((1-xPercentage)/Config.CellSize)*SWVelocity
 
+        topX = (xPercentage)*NEVelocity + ((1-xPercentage))*NWVelocity
+        bottomX = (xPercentage)*SEVelocity + ((1-xPercentage))*SWVelocity
 
-        interpolatedScalar = (yPercentage/Config.CellSize)*bottomX + ((1-yPercentage)/Config.CellSize)*topX
+        if printStatus:
+            # print(NEVelocity)
+            # print(NWVelocity)
+            # print("topx",topX)
+            # print("botomx",bottomX)
+            # print("ypercentage",yPercentage)
+            pass
+
+        # interpolatedScalar = (yPercentage/Config.CellSize)*bottomX + ((1-yPercentage)/Config.CellSize)*topX
+        interpolatedScalar = (yPercentage)*bottomX + ((1-yPercentage))*topX
         # print(interpolatedScalar)
         # print('\n')
         return interpolatedScalar
     
     def advectVelocities(self, hVectorField, vVectorField):
-        for j in range(1,self.rows-1):
-            for i in range(1,self.columns-1):
+        for j in range(3,self.rows-3):
+            for i in range(3,self.columns-3):
                 # coordinates = [(i+hVectorField.origin[0])*Config.CellSize,(j+hVectorField.origin[1])*Config.CellSize]
-                coordinates = ((i+self.origin[0])*Config.CellSize,(j+self.origin[1])*Config.CellSize)
-                hVelocity = hVectorField.bilinearInterpolate(coordinates)
+                # coordinates = ((i+self.origin[0])*Config.CellSize,(j+self.origin[1])*Config.CellSize)
+
+                coordinates = ((i+self.origin[1])*Config.CellSize, (j+self.origin[0])*Config.CellSize)
+                # coordinates = ((i)*Config.CellSize,(j)*Config.CellSize)
+
+                hVelocity = hVectorField.bilinearInterpolate(coordinates, True)
+
                 # hVelocity = hVectorField.scalarGrid[j][i]
+
                 hdistance = hVelocity*((-1)*Config.timeStep)
                 # coordinates = [(i+vVectorField.origin[0])*Config.CellSize,(j+vVectorField.origin[1])*Config.CellSize]
-                vVelocity = vVectorField.bilinearInterpolate(coordinates)
+                vVelocity = vVectorField.bilinearInterpolate(coordinates, False)
                 # vVelocity = vVectorField.scalarGrid[j][i]
                 vdistance = vVelocity*((-1)*Config.timeStep)
 
                 # xCoord = i*Config.CellSize - (self.gridDirection[0]*hdistance)
                 # yCoord = j*Config.CellSize - (self.gridDirection[1]*vdistance)
-                xCoord = i*Config.CellSize - hdistance
-                yCoord = j*Config.CellSize - vdistance
-                print(j)
-                print(i)
-                print(xCoord)
-                print(yCoord)
+
+
+                # print("Hvelocity:",hVelocity)
+                # print(hdistance)
+
+                xCoord = (i*Config.CellSize) + hdistance
+                yCoord = (j*Config.CellSize) + vdistance
+
+                # print("\n")
+                # print('xcoord: ' ,xCoord)
+                # print("ycoord",yCoord)
+                # print("***")
                 
                 if self.gridDirection[0] == 1:
-                    self.scalarGrid[j][i] = hVectorField.bilinearInterpolate((xCoord,yCoord))
+                    # print("horizontal error")
+                    self.scalarGrid[j][i] = hVectorField.bilinearInterpolate((xCoord,yCoord), False)
+                    # print("horizontal",self.scalarGrid[j][i])
+
                 elif self.gridDirection[1] == 1:
-                    self.scalarGrid[j][i] = vVectorField.bilinearInterpolate((xCoord,yCoord))
+                    # print("vertical error")
+                    self.scalarGrid[j][i] = vVectorField.bilinearInterpolate((xCoord,yCoord), False)
+                    # print("vertical",self.scalarGrid[j][i])
                 
 
     
@@ -148,8 +195,8 @@ class VisualVectorField(VectorField):
                 xCoord = i*Config.CellSize/Config.upscaleConstant
                 # print(xCoord)
 
-                self.vectorGrid[j][i] = [hVectorField.bilinearInterpolate([xCoord,yCoord]), 
-                                         vVectorField.bilinearInterpolate([xCoord,yCoord])]
+                self.vectorGrid[j][i] = [hVectorField.bilinearInterpolate([xCoord,yCoord], False), 
+                                         vVectorField.bilinearInterpolate([xCoord,yCoord], False)]
                 
                
     def drawVectorField(self, screen):
@@ -207,13 +254,9 @@ class CellMap(ScalarGrid):
         match wallDirection:
             case "north":
                 for i in range(self.columns):
-                # for j in range(self.rows):
-                #     for i in range(self.columns):
                         self.scalarGrid[0][i] = np.float64(1)
             case "east":
                 for j in range(self.rows):
-                # for j in range(self.rows):
-                #     for i in range(self.columns):
                         self.scalarGrid[j][self.columns-1] = np.float64(1)
             case "south":
                 for i in range(self.columns):
@@ -230,7 +273,23 @@ class CellMap(ScalarGrid):
         pass
 
     def setWallVoid(self, wallDirection):
-        pass
+        match wallDirection:
+            case "north":
+                for i in range(self.columns):
+                        self.scalarGrid[0][i] = np.float64(3)
+            case "east":
+                for j in range(self.rows):
+                        self.scalarGrid[j][self.columns-1] = np.float64(3)
+            case "south":
+                for i in range(self.columns):
+                # for j in range(self.rows):
+                #     for i in range(self.columns):
+                        self.scalarGrid[self.rows-1][i] = np.float64(3)
+            case "west":
+                for j in range(self.rows):
+                # for j in range(self.rows):
+                #     for i in range(self.columns):
+                        self.scalarGrid[j][0] = np.float64(3)
 
 
 
@@ -244,15 +303,14 @@ class PressureField(ScalarGrid):
     #         for i in range(self.columns):
     #             if cellMap[j][i] == 1:
 
-
     def GaussSeidelLoop(self, divGrid, cellMap):
         for _ in range (Config.GaussSeidelIterations):
             self.calculatePressureGrid(divGrid, cellMap)
 
-    def GaussSeidelLoopDebug(self, divGrid, cellMap):
-        for _ in range (Config.GaussSeidelIterations):
-            x = input("?")
-            self.calculatePressureGrid(divGrid, cellMap)
+    # def GaussSeidelLoopDebug(self, divGrid, cellMap):
+    #     for _ in range (Config.GaussSeidelIterations):
+    #         x = input("?")
+    #         self.calculatePressureGrid(divGrid, cellMap)
 
     def calculatePressureGrid(self, divGrid, cellMap):
         divGrid = divGrid.scalarGrid
