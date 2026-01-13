@@ -77,45 +77,55 @@ while running:
                 hVectorField.setZero()
                 vVectorField.setZero()
             if event.key == pygame.K_r:
-                hVectorField.scalarGrid[7][7] -= 0.0025
+                hVectorField.scalarGrid[20][25] -= Config.manualVelocityInjection
             if event.key == pygame.K_t:
-                hVectorField.scalarGrid[7][7] += 0.000025
+                hVectorField.scalarGrid[20][25] += Config.manualVelocityInjection
             if event.key == pygame.K_f:
-                vVectorField.scalarGrid[3][4] -= 0.000025
+                vVectorField.scalarGrid[20][25] -= Config.manualVelocityInjection
             if event.key == pygame.K_g:
                 # vVectorField.scalarGrid[7][7] += 0.000025
-                vVectorField.scalarGrid[3][7] += 3
+                vVectorField.scalarGrid[20][25] += Config.manualVelocityInjection
 
 
     if True:
-        temphVectorField.advectVelocities(hVectorField, vVectorField)
-        tempvVectorField.advectVelocities(hVectorField, vVectorField)
+        # vVectorField.scalarGrid[20][25] = -3
+        if False:
+            temphVectorField.advectVelocities(hVectorField, vVectorField)
+            tempvVectorField.advectVelocities(hVectorField, vVectorField)
 
-        hVectorField.scalarGrid = list(temphVectorField.scalarGrid)
-        vVectorField.scalarGrid = list(tempvVectorField.scalarGrid)
+            hVectorField.scalarGrid = list(temphVectorField.scalarGrid)
+            vVectorField.scalarGrid = list(tempvVectorField.scalarGrid)
+            pass
+        if True:
+            divergenceGrid.calculateDivergence(hVectorField,vVectorField)
+            
+            pressureGrid.GaussSeidelLoop(divergenceGrid,cellMapGrid)
 
-        # for x in range(7,20):
-        #     vVectorField.scalarGrid[7][7] = 3
+            hVectorField.calculateVelocityGrid(pressureGrid)
+            vVectorField.calculateVelocityGrid(pressureGrid)
 
-        # divergenceGrid.calculateDivergence(hVectorField,vVectorField)
-        
-        # pressureGrid.GaussSeidelLoop(divergenceGrid,cellMapGrid)
-
-        # hVectorField.calculateVelocityGrid(pressureGrid)
-        # vVectorField.calculateVelocityGrid(pressureGrid)
-
-        # hVectorField.setBoundaryConditions(cellMapGrid)
-        # vVectorField.setBoundaryConditions(cellMapGrid)
+            hVectorField.setBoundaryConditions(cellMapGrid)
+            vVectorField.setBoundaryConditions(cellMapGrid)
+            pass
+        pass
 
 
-    # hVectorField.drawVectorField(screen)
-    # vVectorField.drawVectorField(screen)
-    # pressureGrid.drawGrid(screen)
-    # vVectorField.scalarGrid[3][3] += 3
+    
+    
+    pressureGrid.drawGrid(screen)
 
+    
 
     visualVectorField.interpolateUpscaledGrid(hVectorField,vVectorField)
     visualVectorField.drawVectorField(screen)
+
+    hVectorField.drawVectorField(screen)
+    vVectorField.drawVectorField(screen)
+
+    # print(hVectorField.bilinearInterpolate([25*Config.CellSize,20*Config.CellSize], printStatus=False) )
+    # print(vVectorField.bilinearInterpolate([25*Config.CellSize,20*Config.CellSize]) )
+    # print()
+
 
     # temphVectorField.drawVectorField(screen)
     # tempvVectorField.drawVectorField(screen)

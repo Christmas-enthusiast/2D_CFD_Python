@@ -36,11 +36,15 @@ class VectorField(ScalarGrid):
                 vectorEndX = xOffset+cellSize*iIndex+vector[0]*Config.VectorVisualScale
                 vectorEndY = yOffset+cellSize*jIndex+vector[1]*Config.VectorVisualScale
                 
-                pygame.draw.line(screen, self.colour, vectorStart, (vectorEndX, vectorEndY))
-                pygame.draw.circle(screen,self.colour, (vectorEndX, vectorEndY), Config.VectorBallRadius)
+                self.drawVector(screen, vectorStart, (vectorEndX,vectorEndY), drawTail=True)
+                # pygame.draw.line(screen, self.colour, vectorStart, (vectorEndX, vectorEndY))
+                # pygame.draw.circle(screen,self.colour, (vectorEndX, vectorEndY), Config.VectorBallRadius)
 
-    def drawVector(self, screen):
-        pass
+    def drawVector(self, screen, vectorStart, vectorEnd, drawBall=True, drawTail=True):
+        if drawTail:
+            pygame.draw.line(screen, self.colour, vectorStart, vectorEnd)
+        if drawBall:
+            pygame.draw.circle(screen, self.colour, vectorEnd, Config.VectorBallRadius)
 
     def setBoundaryConditions(self, cellMap):
         verticalChange = 0
@@ -74,24 +78,37 @@ class VectorField(ScalarGrid):
             for i in range(1,self.columns-1):
                 self.scalarGrid[j][i] -= ( preGrid[j-self.gridDirection[1]][i-self.gridDirection[0]] - preGrid[j][i])*Config.kConstant
 
-    def bilinearInterpolate(self, coordinates, printStatus): #coordinate in real world values
-        # xCoord = coordinates[0]
-        # yCoord = coordinates[1]
-        # jIndex = int((coordinates[1] + (self.origin[0]*Config.CellSize*2))/Config.CellSize)
-        # iIndex = int((coordinates[0] + (self.origin[1]*Config.CellSize*2))/Config.CellSize)
+    def bilinearInterpolate(self, coordinates, printStatus=False): #coordinate in real world values
 
-        # xCoord = coordinates[0] + (self.origin[1]*Config.CellSize*1)
-        # yCoord = coordinates[1] + (self.origin[0]*Config.CellSize*1)
+        # xCoord = coordinates[0] + (self.origin[1]*Config.CellSize)
+        # yCoord = coordinates[1] + (self.origin[0]*Config.CellSize)
 
-        xCoord = coordinates[0] + (self.origin[1]*Config.CellSize)
-        yCoord = coordinates[1] + (self.origin[0]*Config.CellSize)
+        xCoord = coordinates[0] #- (self.origin[1]*Config.CellSize)
+        yCoord = coordinates[1] #- (self.origin[0]*Config.CellSize)
+        
 
         xCoord /= Config.CellSize
         yCoord /= Config.CellSize
+        # yCoord += 1
         jIndex = int((coordinates[1])/(Config.CellSize))
         iIndex = int((coordinates[0])/(Config.CellSize))
         xPercentage = (xCoord-iIndex)
         yPercentage = (yCoord-jIndex)
+
+
+        if printStatus:
+            # print(coordinates)
+            # print(xCoord)
+            # print(yCoord)
+            # print(iIndex)
+            # print(jIndex)
+            # print(len(self.scalarGrid[0]))
+            # print()
+            
+            # print(xPercentage)
+            # print(yPercentage)
+            # print()
+            pass
 
         # print(self.gridDirection[0])
         # print(self.scalarGrid)
@@ -110,6 +127,8 @@ class VectorField(ScalarGrid):
         SWVelocity = self.scalarGrid[jIndex+1][iIndex]
         SEVelocity = self.scalarGrid[jIndex+1][iIndex+1]
 
+        
+
         # topX = (xPercentage/Config.CellSize)*NEVelocity + ((1-xPercentage)/Config.CellSize)*NWVelocity
         # bottomX = (xPercentage/Config.CellSize)*SEVelocity + ((1-xPercentage)/Config.CellSize)*SWVelocity
 
@@ -126,20 +145,29 @@ class VectorField(ScalarGrid):
 
         # interpolatedScalar = (yPercentage/Config.CellSize)*bottomX + ((1-yPercentage)/Config.CellSize)*topX
         interpolatedScalar = (yPercentage)*bottomX + ((1-yPercentage))*topX
+
+        if interpolatedScalar != 0 and printStatus==True:
+            print(xPercentage)
+            print(yPercentage)
+            print()
         # print(interpolatedScalar)
         # print('\n')
         return interpolatedScalar
     
     def advectVelocities(self, hVectorField, vVectorField):
-        for j in range(3,self.rows-3):
-            for i in range(3,self.columns-3):
+        for j in range(2,self.rows-2):
+            for i in range(2,self.columns-2):
                 # coordinates = [(i+hVectorField.origin[0])*Config.CellSize,(j+hVectorField.origin[1])*Config.CellSize]
                 # coordinates = ((i+self.origin[0])*Config.CellSize,(j+self.origin[1])*Config.CellSize)
 
+                #first line creates waves
+                # coordinates = ((i+self.origin[0])*Config.CellSize, (j+self.origin[1])*Config.CellSize)
                 coordinates = ((i+self.origin[1])*Config.CellSize, (j+self.origin[0])*Config.CellSize)
+
+                #the coordinates should take into account the vector field's origin
                 # coordinates = ((i)*Config.CellSize,(j)*Config.CellSize)
 
-                hVelocity = hVectorField.bilinearInterpolate(coordinates, True)
+                hVelocity = hVectorField.bilinearInterpolate(coordinates, False)
 
                 # hVelocity = hVectorField.scalarGrid[j][i]
 
@@ -193,8 +221,13 @@ class VisualVectorField(VectorField):
                 #calculate real world coordinates of each grid point
                 yCoord = j*Config.CellSize/Config.upscaleConstant
                 xCoord = i*Config.CellSize/Config.upscaleConstant
-                # print(xCoord)
 
+                # yCoord += self.origin[0]*Config.CellSize
+                # xCoord += self.origin[1]*Config.CellSize
+                # print(xCoord)
+                # print(yCoord)
+
+                #use real world coordinates to calculate vector value
                 self.vectorGrid[j][i] = [hVectorField.bilinearInterpolate([xCoord,yCoord], False), 
                                          vVectorField.bilinearInterpolate([xCoord,yCoord], False)]
                 
@@ -211,9 +244,11 @@ class VisualVectorField(VectorField):
                 vector = [self.gridDirection[0]*vector[0], self.gridDirection[1]*vector[1]]
                 vectorEndX = xOffset+cellSize*iIndex+vector[0]*Config.VectorVisualScale
                 vectorEndY = yOffset+cellSize*jIndex+vector[1]*Config.VectorVisualScale
+
+                self.drawVector(screen, vectorStart, (vectorEndX,vectorEndY), drawTail=True)
                 
-                pygame.draw.line(screen, self.colour, vectorStart, (vectorEndX, vectorEndY))
-                pygame.draw.circle(screen,self.colour, (vectorEndX, vectorEndY), Config.VectorBallRadius)
+                # pygame.draw.line(screen, self.colour, vectorStart, (vectorEndX, vectorEndY))
+                # pygame.draw.circle(screen,self.colour, (vectorEndX, vectorEndY), Config.VectorBallRadius)
 
 
 
