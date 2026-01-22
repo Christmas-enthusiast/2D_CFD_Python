@@ -94,7 +94,7 @@ while running:
 
     if True:
         # vVectorField.scalarGrid[20][25] = -3
-        if False:
+        if True:
             temphVectorField.advectVelocities(hVectorField, vVectorField)
             tempvVectorField.advectVelocities(hVectorField, vVectorField)
 
@@ -102,7 +102,7 @@ while running:
             vVectorField.scalarGrid = list(tempvVectorField.scalarGrid)
             
             pass
-        if True:
+        if False:
             divergenceGrid.calculateDivergence(hVectorField,vVectorField)
             
             pressureGrid.GaussSeidelLoop(divergenceGrid,cellMapGrid)

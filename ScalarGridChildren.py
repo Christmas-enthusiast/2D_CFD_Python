@@ -83,8 +83,8 @@ class VectorField(ScalarGrid):
 
     def bilinearInterpolate(self, coordinates, printStatus=False): #coordinate in real world values
 
-        xCoord = coordinates[0] - (self.origin[1]*Config.CellSize)
-        yCoord = coordinates[1] - (self.origin[0]*Config.CellSize)
+        xCoord = coordinates[0] - (self.origin[0]*Config.CellSize)
+        yCoord = coordinates[1] - (self.origin[1]*Config.CellSize)
 
         # xCoord = coordinates[0] #- (self.origin[1]*Config.CellSize)
         # yCoord = coordinates[1] #- (self.origin[0]*Config.CellSize)
@@ -116,48 +116,21 @@ class VectorField(ScalarGrid):
             print()
             pass
 
-        # print(self.gridDirection[0])
-        # print(self.scalarGrid)
-        # print("\n")
-        # print(coordinates)
-        # print(xCoord)
-        # print(yCoord)
-        # print(jIndex)
-        # print(iIndex)
-        # print('*****')
-
 
         NWVelocity = self.scalarGrid[jIndex][iIndex]
-        # print(NWVelocity)
         NEVelocity = self.scalarGrid[jIndex][iIndex+1]
         SWVelocity = self.scalarGrid[jIndex+1][iIndex]
         SEVelocity = self.scalarGrid[jIndex+1][iIndex+1]
 
-        
-
-        # topX = (xPercentage/Config.CellSize)*NEVelocity + ((1-xPercentage)/Config.CellSize)*NWVelocity
-        # bottomX = (xPercentage/Config.CellSize)*SEVelocity + ((1-xPercentage)/Config.CellSize)*SWVelocity
-
         topX = (xPercentage)*NEVelocity + ((1-xPercentage))*NWVelocity
+
         bottomX = (xPercentage)*SEVelocity + ((1-xPercentage))*SWVelocity
 
-        if printStatus:
-            # print(NEVelocity)
-            # print(NWVelocity)
-            # print("topx",topX)
-            # print("botomx",bottomX)
-            # print("ypercentage",yPercentage)
-            pass
 
-        # interpolatedScalar = (yPercentage/Config.CellSize)*bottomX + ((1-yPercentage)/Config.CellSize)*topX
+        #this first version is allegedly correct
+        # interpolatedScalar = (yPercentage)*topX + ((1-yPercentage))*bottomX
         interpolatedScalar = (yPercentage)*bottomX + ((1-yPercentage))*topX
 
-        # if interpolatedScalar != 0 and printStatus==True:
-        #     print(xPercentage)
-        #     print(yPercentage)
-        #     print()
-        # print(interpolatedScalar)
-        # print('\n')
         return interpolatedScalar
     
     def advectVelocities(self, hVectorField, vVectorField):

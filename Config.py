@@ -1,5 +1,5 @@
-SCREENWIDTH = 900
-SCREENHEIGHT = 600
+SCREENWIDTH = 1900
+SCREENHEIGHT = 1000
 
 rowCount = 25
 columnCount = 35 #in context of centered grids
@@ -17,7 +17,7 @@ kConstant = timeStep/(CellSize*fluidDensity)
 manualVelocityInjection = 2
 
 
-CellVisualSize = 25
+CellVisualSize = 35
 ScalarFontSize = 20
 ScalarGridRoundingCutoff = 1
 
@@ -25,7 +25,7 @@ ScalarGridRoundingCutoff = 1
 VectorVisualScale = 30
 VectorBallRadius = 1
 
-upscaleConstant = 4
+upscaleConstant = 5
 
 VisualVectorCellSize = CellVisualSize/upscaleConstant
 
