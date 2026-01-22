@@ -9,7 +9,10 @@ class VectorFieldNew():
         for x in range(rows): #arranged as a list containing lists of all values in a row
             self.scalarGrid.append([])
             for _ in range(columns):
-                self.scalarGrid[x].append(np.float64(0))
+                self.scalarGrid[x].append([np.float64(0),np.float64(0)])
+    
+
+
 
 class VectorField(ScalarGrid):
     def __init__(self, rows, columns, colour, origin, gridDirection):
@@ -80,26 +83,29 @@ class VectorField(ScalarGrid):
 
     def bilinearInterpolate(self, coordinates, printStatus=False): #coordinate in real world values
 
-        # xCoord = coordinates[0] + (self.origin[1]*Config.CellSize)
-        # yCoord = coordinates[1] + (self.origin[0]*Config.CellSize)
+        xCoord = coordinates[0] - (self.origin[1]*Config.CellSize)
+        yCoord = coordinates[1] - (self.origin[0]*Config.CellSize)
 
-        xCoord = coordinates[0] #- (self.origin[1]*Config.CellSize)
-        yCoord = coordinates[1] #- (self.origin[0]*Config.CellSize)
+        # xCoord = coordinates[0] #- (self.origin[1]*Config.CellSize)
+        # yCoord = coordinates[1] #- (self.origin[0]*Config.CellSize)
         
 
         xCoord /= Config.CellSize
         yCoord /= Config.CellSize
         # yCoord += 1
-        jIndex = int((coordinates[1])/(Config.CellSize))
-        iIndex = int((coordinates[0])/(Config.CellSize))
+        # jIndex = int((coordinates[1])/(Config.CellSize))
+        # iIndex = int((coordinates[0])/(Config.CellSize))
+
+        jIndex = int(yCoord)
+        iIndex = int(xCoord)
         xPercentage = (xCoord-iIndex)
         yPercentage = (yCoord-jIndex)
 
 
         if printStatus:
             # print(coordinates)
-            # print(xCoord)
-            # print(yCoord)
+            print(xCoord)
+            print(yCoord)
             # print(iIndex)
             # print(jIndex)
             # print(len(self.scalarGrid[0]))
@@ -107,7 +113,7 @@ class VectorField(ScalarGrid):
             
             # print(xPercentage)
             # print(yPercentage)
-            # print()
+            print()
             pass
 
         # print(self.gridDirection[0])
@@ -146,10 +152,10 @@ class VectorField(ScalarGrid):
         # interpolatedScalar = (yPercentage/Config.CellSize)*bottomX + ((1-yPercentage)/Config.CellSize)*topX
         interpolatedScalar = (yPercentage)*bottomX + ((1-yPercentage))*topX
 
-        if interpolatedScalar != 0 and printStatus==True:
-            print(xPercentage)
-            print(yPercentage)
-            print()
+        # if interpolatedScalar != 0 and printStatus==True:
+        #     print(xPercentage)
+        #     print(yPercentage)
+        #     print()
         # print(interpolatedScalar)
         # print('\n')
         return interpolatedScalar
@@ -162,12 +168,14 @@ class VectorField(ScalarGrid):
 
                 #first line creates waves
                 # coordinates = ((i+self.origin[0])*Config.CellSize, (j+self.origin[1])*Config.CellSize)
-                coordinates = ((i+self.origin[1])*Config.CellSize, (j+self.origin[0])*Config.CellSize)
+
+                coordinates = [(i-self.origin[1])*Config.CellSize, (j-self.origin[0])*Config.CellSize]
 
                 #the coordinates should take into account the vector field's origin
                 # coordinates = ((i)*Config.CellSize,(j)*Config.CellSize)
 
                 hVelocity = hVectorField.bilinearInterpolate(coordinates, False)
+                
 
                 # hVelocity = hVectorField.scalarGrid[j][i]
 
@@ -184,8 +192,11 @@ class VectorField(ScalarGrid):
                 # print("Hvelocity:",hVelocity)
                 # print(hdistance)
 
-                xCoord = (i*Config.CellSize) + hdistance
-                yCoord = (j*Config.CellSize) + vdistance
+                # xCoord = (i*Config.CellSize) + hdistance
+                # yCoord = (j*Config.CellSize) + vdistance
+
+                coordinates[0] += hdistance
+                coordinates[1] += vdistance
 
                 # print("\n")
                 # print('xcoord: ' ,xCoord)
@@ -194,12 +205,12 @@ class VectorField(ScalarGrid):
                 
                 if self.gridDirection[0] == 1:
                     # print("horizontal error")
-                    self.scalarGrid[j][i] = hVectorField.bilinearInterpolate((xCoord,yCoord), False)
+                    self.scalarGrid[j][i] = hVectorField.bilinearInterpolate(coordinates, False)
                     # print("horizontal",self.scalarGrid[j][i])
 
                 elif self.gridDirection[1] == 1:
                     # print("vertical error")
-                    self.scalarGrid[j][i] = vVectorField.bilinearInterpolate((xCoord,yCoord), False)
+                    self.scalarGrid[j][i] = vVectorField.bilinearInterpolate(coordinates, False)
                     # print("vertical",self.scalarGrid[j][i])
                 
 

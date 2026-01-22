@@ -1,5 +1,5 @@
-SCREENWIDTH = 1000
-SCREENHEIGHT = 700
+SCREENWIDTH = 900
+SCREENHEIGHT = 600
 
 rowCount = 25
 columnCount = 35 #in context of centered grids

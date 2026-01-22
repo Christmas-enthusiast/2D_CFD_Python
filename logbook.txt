@@ -1,0 +1,12 @@
+January 14, 2026
+I've been going around in circles for probably a week now, hopefully this log will help me organize my thoughts
+and properly focus my efforts.
+
+The current issue that needs fixing is broken velocity advection. More specifically when the pressure solver is
+turned off but advection system on. 
+The problem is incredibly confusing to me right now. When i inject negative horizontal or vertical velocities, 
+the advection works properly. However if I inject positive velocities, nothing happens. There's also an issue with
+a weird cascading issue where injecting negative horizontal and positive velocities at the same time creates a 
+horizontal travelling "carriage" that itself injects vertical negative velocity. 
+I believe the core issue right now is the implementation of two component velocity grids. The next fix attempt 
+should be using a true vector velocity grid.

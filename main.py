@@ -29,7 +29,7 @@ pressureGrid.calculatePressureGrid(divergenceGrid, cellMapGrid)
 # tempvVectorField = ScalarGridChildren.VectorField(Config.rowCount+1, Config.columnCount, (0, 0.5))
 visualVectorField = ScalarGridChildren.VisualVectorField(Config.rowCount*Config.upscaleConstant,
                                                          Config.columnCount*Config.upscaleConstant,
-                                                         Config.BLUE, (0.5,0.5), (1,1))
+                                                         Config.BLUE, (0,0), (1,1))
 
 temphVectorField = ScalarGridChildren.VectorField(Config.rowCount, Config.columnCount+1, Config.WHITE, (0, 0.5), (1,0)) 
 tempvVectorField = ScalarGridChildren.VectorField(Config.rowCount+1, Config.columnCount, Config.LIGHTGREY, (0.5, 0), (0,1)) 
@@ -62,15 +62,15 @@ while running:
                 hVectorField.scalarGrid = list(temphVectorField.scalarGrid)
                 vVectorField.scalarGrid = list(tempvVectorField.scalarGrid)
 
-                divergenceGrid.calculateDivergence(hVectorField,vVectorField)
+                # divergenceGrid.calculateDivergence(hVectorField,vVectorField)
                 
-                pressureGrid.GaussSeidelLoop(divergenceGrid,cellMapGrid)
+                # pressureGrid.GaussSeidelLoop(divergenceGrid,cellMapGrid)
 
-                hVectorField.calculateVelocityGrid(pressureGrid)
-                vVectorField.calculateVelocityGrid(pressureGrid)
+                # hVectorField.calculateVelocityGrid(pressureGrid)
+                # vVectorField.calculateVelocityGrid(pressureGrid)
 
-                hVectorField.setBoundaryConditions(cellMapGrid)
-                vVectorField.setBoundaryConditions(cellMapGrid)
+                # hVectorField.setBoundaryConditions(cellMapGrid)
+                # vVectorField.setBoundaryConditions(cellMapGrid)
 
 
             if event.key == pygame.K_0:
@@ -86,6 +86,11 @@ while running:
                 # vVectorField.scalarGrid[7][7] += 0.000025
                 vVectorField.scalarGrid[20][25] += Config.manualVelocityInjection
 
+    # print("horizontal")
+    # print(hVectorField.bilinearInterpolate([25.5*Config.CellSize, 20*Config.CellSize], printStatus=True))
+    # print("vertical")
+    # print(vVectorField.bilinearInterpolate([25*Config.CellSize, 20.5*Config.CellSize], printStatus=True))
+
 
     if True:
         # vVectorField.scalarGrid[20][25] = -3
@@ -95,6 +100,7 @@ while running:
 
             hVectorField.scalarGrid = list(temphVectorField.scalarGrid)
             vVectorField.scalarGrid = list(tempvVectorField.scalarGrid)
+            
             pass
         if True:
             divergenceGrid.calculateDivergence(hVectorField,vVectorField)
@@ -108,6 +114,8 @@ while running:
             vVectorField.setBoundaryConditions(cellMapGrid)
             pass
         pass
+
+
 
 
     
