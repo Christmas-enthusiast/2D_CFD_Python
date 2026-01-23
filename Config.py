@@ -1,20 +1,20 @@
 SCREENWIDTH = 1900
-SCREENHEIGHT = 1000
+SCREENHEIGHT = 1200
 
-rowCount = 25
-columnCount = 35 #in context of centered grids
+rowCount = 30
+columnCount = 50 #in context of centered grids
 GaussSeidelIterations = 50
 
 
 GridOrigin = [15,15]
 fluidDensity = 1.225 #kg/m^3
 # fluidDensity = 1.9
-CellSize = 0.0001 # meters
-timeStep = 0.0001 # seconds
+CellSize = 0.5 # meters
+timeStep = 0.1 # seconds
 kConstant = timeStep/(CellSize*fluidDensity)
 # kConstant = 1
 
-manualVelocityInjection = 2
+manualVelocityInjection = 0.5
 
 
 CellVisualSize = 35
@@ -25,7 +25,7 @@ ScalarGridRoundingCutoff = 1
 VectorVisualScale = 30
 VectorBallRadius = 1
 
-upscaleConstant = 5
+upscaleConstant = 3
 
 VisualVectorCellSize = CellVisualSize/upscaleConstant
 

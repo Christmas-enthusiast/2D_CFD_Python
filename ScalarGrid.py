@@ -3,6 +3,21 @@ import pygame
 import Config
 import random
 
+
+class SolidParticle:
+    def __init__(self, startingCoords, radius, colour):
+        self.Xcoord = startingCoords[0]
+        self.Ycoord = startingCoords[1]
+        self.radius = radius
+        self.colour = colour
+
+    def drawParticle(self, screen):
+        pygame.draw.circle(screen, self.colour, (self.Xcoord, self.Ycoord), self.radius)
+    
+    def advectParticle(self, vVectorField, hVectorField):
+        pass
+
+
 class ScalarGrid:
     def __init__(self, rows, columns, origin):
 
