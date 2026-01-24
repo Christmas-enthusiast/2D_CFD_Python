@@ -3,7 +3,7 @@ SCREENHEIGHT = 1200
 
 rowCount = 30
 columnCount = 50 #in context of centered grids
-GaussSeidelIterations = 50
+GaussSeidelIterations = 30
 
 
 GridOrigin = [15,15]

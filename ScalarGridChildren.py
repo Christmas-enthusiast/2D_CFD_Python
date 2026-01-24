@@ -331,12 +331,30 @@ class PressureField(ScalarGrid):
         divGrid = divGrid.scalarGrid
         for j in range(1,self.rows-1):
             for i in range(1,self.columns-1):
-                right = self.findNeighbourPressureValue(j, i, [0,1], cellMap)
-                left = self.findNeighbourPressureValue(j,i,[0,-1], cellMap)
-                top = self.findNeighbourPressureValue(j,i,[-1,0], cellMap)
-                bottom = self.findNeighbourPressureValue(j,i,[1,0], cellMap)
+                divisionValue = 0
 
-                self.scalarGrid[j][i] = (right + left + top + bottom - ( (divGrid[j][i])/Config.kConstant ) )/4
+                right = self.findNeighbourPressureValue(j, i, [0,1], cellMap)
+                divisionValue += right[1]
+
+                left = self.findNeighbourPressureValue(j,i,[0,-1], cellMap)
+                divisionValue += left[1]
+
+                top = self.findNeighbourPressureValue(j,i,[-1,0], cellMap)
+                divisionValue += top[1]
+
+                bottom = self.findNeighbourPressureValue(j,i,[1,0], cellMap)
+                divisionValue += bottom[1]
+
+                # if divisionValue == 4:
+                #     print(divisionValue)
+                #     print(right)
+                #     print(left)
+                #     print(top)
+                #     print(bottom)
+                #     print(self.scalarGrid[j][i])
+                #     print()
+                self.scalarGrid[j][i] = (right[0]*right[1] + left[0]*left[1] + top[0]*top[1] + bottom[0]*bottom[1] - ( (divGrid[j][i])/Config.kConstant ) )/divisionValue
+                
 
     def findNeighbourPressureValue(self, j, i, direction, cellMap):
         cellMap = cellMap.scalarGrid
@@ -354,13 +372,13 @@ class PressureField(ScalarGrid):
             #2 = fan
             #3 = void
         if cellMap[j][i] == 0:
-            return self.scalarGrid[j][i]
+            return self.scalarGrid[j][i] , 1
         elif cellMap[j][i] == 1 or cellMap[j][i] == 2:
-            return self.scalarGrid[originJ][originI] #use Pc pressure
+            return self.scalarGrid[originJ][originI] , 0 #use Pc pressure
         # elif cellMap[j][i] == 2:
         #     return self.scalarGrid[originJ][originI]
         elif cellMap[j][i] == 3:
-            return 0
+            return 0 , 1
 
 
 

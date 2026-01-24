@@ -36,9 +36,9 @@ temphVectorField = ScalarGridChildren.VectorField(Config.rowCount, Config.column
 tempvVectorField = ScalarGridChildren.VectorField(Config.rowCount+1, Config.columnCount, Config.LIGHTGREY, (0.5, 0), (0,1)) 
 
 
-cellMapGrid.setWallSolid('north')
+cellMapGrid.setWallVoid('north')
 cellMapGrid.setWallVoid('east')
-cellMapGrid.setWallSolid('south')
+cellMapGrid.setWallVoid('south')
 cellMapGrid.setWallVoid('west')
 hVectorField.setBoundaryConditions(cellMapGrid)
 vVectorField.setBoundaryConditions(cellMapGrid)
@@ -165,7 +165,9 @@ while running:
         for row in range(Config.rowCount):
             hVectorField.scalarGrid[row][3] = Config.manualVelocityInjection
 
-        # pressureGrid.scalarGrid[30][10] = 5
+        
+
+        # pressureGrid.scalarGrid[15][10] = -500
         
         # vVectorField.scalarGrid[50][35] = -Config.manualVelocityInjection
 
@@ -223,8 +225,8 @@ while running:
 
     cellMapGrid.drawCellMap(screen)
 
-    # hVectorField.drawVectorField(screen)
-    # vVectorField.drawVectorField(screen)
+    hVectorField.drawVectorField(screen)
+    vVectorField.drawVectorField(screen)
 
     # print(hVectorField.bilinearInterpolate([25*Config.CellSize,20*Config.CellSize], printStatus=False) )
     # print(vVectorField.bilinearInterpolate([25*Config.CellSize,20*Config.CellSize]) )
